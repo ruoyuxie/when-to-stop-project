@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Dynamic Context Cutoff: Efficient LLM Inference via Self-Termination</title>
+    <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.3/css/bulma.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Google Sans', sans-serif; }
+        .hero-body { padding: 1rem 1.5rem; }
+        .publication-title { font-family: 'Google Sans', sans-serif; }
+        .publication-authors { font-family: 'Google Sans', sans-serif; font-size: 1.4em; line-height: 1.8; text-align: center; }
+        .publication-affiliations { font-family: 'Google Sans', sans-serif; font-size: 1em; margin-top: 0.5em; text-align: center; }
+        .subtitle a { color: #4a4a4a; }
+        .content { font-family: 'Google Sans', sans-serif; font-size: 1.2em; }
+        .section { padding: 3rem 1.5rem; }
+        .emoji { font-size: 1em; vertical-align: middle; }
+        .highlight { background-color: #fff3cd; padding: 0 3px; }
+        .math { font-family: 'Castoro', serif; font-style: italic; }
+        .publication-links { font-size: 1em; margin-top: 0em; }
+        .publication-links .button { font-size: 1.1em; }
+        .call-to-action { background-color: #f5f5f5; padding: 1em; border-radius: 5px; margin-top: 2em; }
+    </style>
+</head>
+<body>
+    <section class="hero">
+        <div class="hero-body">
+            <div class="container is-max-desktop">
+                <div class="columns is-centered">
+                    <div class="column has-text-centered">
+                        <br>
+                        <h1 class="title is-1 publication-title">
+                            Knowing When to Stop: Dynamic Context Cutoff for Large Language Models
+                        </h1>
+                        <div class="publication-authors">
+                            <p>
+                                <a href="authors/roy-xie.html" target="_blank">Roy Xie</a><sup>1</sup>, 
+                                <a href="authors/junlin-wang.html" target="_blank">Junlin Wang</a><sup>1</sup>, 
+                                <a href="authors/paul-rosu.html" target="_blank">Paul Rosu</a><sup>1</sup>, 
+                                <br>
+                                <a href="authors/chunyuan-deng.html" target="_blank">Chunyuan Deng</a><sup>2</sup>, 
+                                <a href="authors/bolun-sun.html" target="_blank">Bolun Sun</a><sup>3</sup>, 
+                                <a href="authors/zihao-lin.html" target="_blank">Zihao Lin</a><sup>4</sup>, 
+                                <a href="authors/bhuwan-dhingra.html" target="_blank">Bhuwan Dhingra</a><sup>1</sup>
+                            </p>
+                            <p class="publication-affiliations">
+                                <sup>1</sup> Duke &nbsp;&nbsp;&nbsp;
+                                <sup>2</sup> Rice &nbsp;&nbsp;&nbsp;
+                                <sup>3</sup> JHU &nbsp;&nbsp;&nbsp;
+                                <sup>4</sup> UC Davis
+                            </p>
+                        </div>
+                        <br>
+                        <div class="publication-links">
+                            <span class="link-block">
+                                <a href="https://example.com/dynamic_context_cutoff.pdf" class="external-link button is-normal is-rounded is-dark" target="_blank">
+                                    <span class="icon">
+                                        <i class="fas fa-file-pdf"></i>
+                                    </span>
+                                    <span>Paper</span>
+                                </a>
+                            </span>
+                            <span class="link-block">
+                                <a href="https://github.com/example/dynamic-context-cutoff" class="external-link button is-normal is-rounded is-dark" target="_blank">
+                                    <span class="icon">
+                                        <i class="fab fa-github"></i>
+                                    </span>
+                                    <span>Code</span>
+                                </a>
+                            </span>
+                            <span class="link-block">
+                                <a href="https://x.com/dynamiccontext" class="external-link button is-normal is-rounded is-dark" target="_blank">
+                                    <span class="icon">
+                                        <i class="fab fa-x"></i>
+                                    </span>
+                                    <span>Twitter</span>
+                                </a>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    
+    <!-- Overview section -->
+    <section class="section">
+        <div class="container is-max-desktop">
+            <div class="content">
+                <h2 class="title is-3">Overview <span class="emoji">🔍</span></h2>
+                <div class="columns is-vcentered" style="margin-top: -3.5rem;">
+                    <div class="column is-6">
+                        <p>   
+                            We enable language models to <span class="highlight">process <b>only</b> the necessary part of an input</span>. Our method uses internal signals from the attention heads to determine when the model has gathered enough information, resulting in token savings while maintaining task accuracy.
+
+                        </p>
+                    </div>
+                    <div class="column is-6">
+                        <div style="position: relative;">
+                            <img src="./static/images/f1.png" alt="Dynamic Context Cutoff concept illustration" class="image">
+                            <div style="position: absolute; bottom: 5px; right: 5px; background-color: rgba(255, 255, 255, 0.7); padding: 2px 5px; font-size: 0.5em; border-radius: 3px;">
+                                <!-- Image generated by DALL-E -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Key Idea section -->
+    <section class="section" style="margin-top: -3rem;">
+        <div class="container is-max-desktop">
+            <div class="content">
+                <h2 class="title is-3">Key Idea <span class="emoji">💡</span></h2>
+                <div class="columns is-vcentered" style="margin-top: -3.5rem;">
+                    <div class="column is-6">
+                        <p>
+                            The key idea behind our method is that <span class="highlight">specific attention heads in transformer layers naturally encode "sufficiency signals"</span> that indicate when enough information has been processed. Through analysis of model internals, we discovered that these signals can be effectively detected using lightweight classifiers trained on selected attention heads, enabling models to determine when they have acquired sufficient task-relevant information.
+                        </p>
+                    </div>
+                    <div class="column is-6">
+                        <figure class="image">
+                            <img src="./static/images/head_heatmap_1b.png" alt="Classification accuracy graph">
+                            <figcaption class="image-caption">Validation F1 scores for linear probes across all attention heads in LLaMA3.2-1B. Some heads show significantly higher performance on sufficiency detection.</figcaption>
+                        </figure>
+<!-- 
+                        <div style="position: relative;">
+                            <img src="./static/images/head_heatmap_1b.png" alt="Key idea illustration" class="image">
+                        </div> -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- How It Works section -->
+    <section class="section" style="margin-top: -4.5rem;">
+        <div class="container is-max-desktop">
+            <div class="content">
+                <h2 class="title is-3">How It Works <span class="emoji">❓</span></h2>
+                <div class="columns is-vcentered" style="margin-top: -2rem;">
+                    <div class="column is-6">
+                        <ol>
+                            <li>The input text is divided into chunks.</li>
+                            <li>The model iteratively processes each chunk and computes activations.</li>
+                            <li>A classifier examines signals from selected attention heads to assess if enough information has been processed.</li>
+                            <li>When the classifier's confidence exceeds a preset threshold, the model stops processing additional tokens and start generating the answer.</li>
+                        </ol>
+                    </div>
+                    <div class="column is-8">
+                        <div style="position: relative;">                   
+                            <figure class="image">
+                                <img src="./static/images/f2.png" alt="Classification accuracy graph">
+                                <figcaption class="image-caption">Method Overview</figcaption>
+                            </figure>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Main Results section with subsections -->
+    <section class="section">
+        <div class="container is-max-desktop">
+            <div class="content">
+                <h2 class="title is-3">Main Results <span class="emoji">📊</span></h2>
+                <p>
+                    We propose a new paradigm where <span class="highlight">efficiency emerges naturally from the model’s own understanding</span> rather than external compression heuristics. Our method achieves state-of-the-art efficiency and performance across a range of tasks and model sizes.
+                </p>
+                <h3 class="subsection-title">Sufficiency Classification <span class="emoji">🎯</span></h3>
+                <div class="columns is-vcentered">
+                    <div class="column is-6">
+                        <p>
+                            Our method achieves superior sufficiency detection with F1 scores up to 91.1% on 70B models, significantly outperforming both supervised fine-tuning (79.5%) and self-prompting (83.1%). Notably, while smaller models (1B) struggle with self-prompting (F1=52.6%), larger models show emerging self-assessment capabilities, though our probing approach maintains consistently high performance across all model sizes.
+                        </p>
+                    </div>
+                    <div class="column is-6">
+                        <div class="columns">
+                                <figure class="image">
+                                    <img src="./static/images/table1.png" alt="Classification accuracy graph">
+                                </figure>
+                        </div>
+                    </div>
+                </div>
+
+                <h3 class="subsection-title">Efficiency vs. Performance <span class="emoji">⚖️</span></h3>
+                <p>
+
+                    Our method achieves significant efficiency gains while maintaining or improving task performance. For 14B+ models, we reduce token processing by up to 1.22× while improving accuracy. Even with smaller models (8B), our method processes about 1.5× fewer tokens with minimal accuracy impact. Unlike static methods that require predefined compression rates, our approach adaptively determines optimal cutoff points based on content understanding
+                </p>
+                <div class="has-text-centered">
+                    <figure class="image">
+                        <img src="./static/images/accuracy_vs_reduction.png" alt="Token savings vs performance" style="width: 90%;">
+                        <figcaption class="image-caption">Analysis of token savings versus model performance across different tasks and model sizes</figcaption>
+                    </figure>
+                </div>
+                <h3 class="subsection-title">Individual Task Performance <span class="emoji">📈</span></h3>
+                <p>
+                    Our method demonstrates robust performance across both single-hop and multi-hop reasoning tasks. It maintains consistent performance with 49.4% average accuracy on single-hop tasks and 29% on multi-hop tasks, outperforming the leading static baseline (LLMLingua2) by +1.5% absolute accuracy. 
+                </p>
+                <div class="has-text-centered">
+                    <figure class="image">
+                        <img src="./static/images/t1.png" alt="Token savings vs performance" style="width: 90%;">
+                 
+                    </figure>
+                </div>
+                <p>
+                    The method's effectiveness extends to longer contexts (up to 40K tokens), where it consistently outperforms baselines while maintaining adaptive processing. In long-context scenarios, our approach achieves a 1.27× token reduction while preserving task performance, particularly excelling in multi-hop reasoning tasks where traditional methods often struggle.
+                </p>
+                <div class="has-text-centered">
+                    <figure class="image">
+                        <img src="./static/images/t2.png" alt="Individual Task Performance" style="width: 90%;">
+
+                    </figure>
+                </div>
+            </div>
+        </div>
+    </section>
+
+<!-- Additional Analysis section -->
+<section class="section">
+    <div class="container is-max-desktop">
+        <div class="content">
+            <h2 class="title is-3">More Experiments<span class="emoji">📋</span></h2>
+            
+            <h4 class="is-4">🔄 Optimal Chunking: Less is More</h4>
+            <p>
+                While finer-grained chunking (e.g., sentence-level) achieves higher accuracy, our analysis reveals that percentage increment chunking offers the best efficiency-performance trade-off.
+            </p>
+
+            <h4 class="is-4">⚡ The 2K Token Sweet Spot</h4>
+            <p>
+                Our method shows a clear efficiency threshold - becoming significantly faster than full context processing for text beyond 2K tokens.
+            </p>
+
+            <h4 class="is-4">📈 Emergent Self-Assessment in Large Models</h4>
+            <p>
+                We discovered that larger parameter models naturally develop the ability to assess their own information sufficiency through simple prompting.
+            </p>
+
+            <div class="call-to-action">
+                <p><b><span class="highlight">Curious about the details? Check out our <a href="https://example.com/dynamic_context_cutoff.pdf" target="_blank">full paper</a> for in-depth analysis and experiments.</span></b></p>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+    <!-- BibTeX section -->
+    <section class="section" id="BibTeX">
+        <div class="container is-max-desktop content">
+            <h2 class="title is-3">BibTeX <span class="emoji">📚</span></h2>
+            <pre><code>@article{xie2025cutoff,
+    title={Knowing When to Stop: Dynamic Context Cutoff for Large Language Models},
+    author={Xie, Roy and Wang, Junlin and Rosu, Paul and Deng, Chunyuan and Sun, Bolun and Lin, Zihao and Dhingra, Bhuwan},
+    journal={arXiv preprint arXiv:2406.15968},
+    year={2025}
+}</code></pre>
+        </div>
+    </section>
+    
+</body>
+</html>
